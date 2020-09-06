@@ -1,0 +1,37 @@
+/*
+ * testing.c
+ *
+ * Created: 31/03/2020 02:29:42 ã
+ * Author : Elsa7er
+ */ 
+#include "Include.h"
+
+#define GET_BIT(VAR,Bitno)            (((VAR) >> (Bitno)) & 0x01)
+int x = 0;
+void respond(void)
+{
+	while(!GET_BIT(TIFR,0));
+	x++;
+	if((x == 1950))
+	{
+			PORTA = 0x01;
+			_delay_ms(1000);
+			PORTA = 0x00;
+			x = 0;
+	}
+	TIFR |=(1<<0);
+}
+
+int main(void)
+{
+	DDRA = 0x01;
+	TCCR0 = 0b00000010;
+	TCNT0 = 0 ;
+	TIMSK &=~(1<<0);
+	
+	while (1)
+	{	respond();	
+	}
+}
+
+

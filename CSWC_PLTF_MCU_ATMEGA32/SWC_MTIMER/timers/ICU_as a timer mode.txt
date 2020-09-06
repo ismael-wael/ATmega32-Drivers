@@ -1,0 +1,57 @@
+/*
+ * testing.c
+ *
+ * Created: 31/03/2020 02:29:42 ã
+ * Author : Elsa7er
+ */
+#include "Include.h"
+
+/*volatile, because they are used only inside ISR, and hence ISR is not callable,
+ * then the optimizer will delete these variables, so i put "volatile" so that not to delete them*/
+volatile u8 x = 0;
+volatile u16 T_on = 0;
+volatile u16 T_off = 0;
+volatile u16 temp = 0;
+
+ISR(TIMER1_CAPT_vect)
+{
+	temp = ICR1;//to read TCNT1 immediately, so get accurate readings
+	if(x == 0)
+	{
+		x++;
+		TCCR1B &=~(1<<6); // trigger at falling edge
+		MTimer1_enuInit();
+	}
+	else if(x == 1)
+	{
+		x++;
+		T_on = temp;
+		TCCR1B |=(1<<6); // trigger at rising edge
+		MTimer1_enuInit();
+	}
+	else if(x == 2)
+	{
+		T_off = temp;
+		HLCD_voidDisplayString("T_on = ");
+		HLCD_voidIntegerToString(T_on);
+		HLCD_enuGoToXY(1,0);
+		HLCD_voidDisplayString("T_off = ");
+		HLCD_voidIntegerToString(T_off);
+		while(1);//stuck the code here
+	}
+}
+
+int main(void)
+{
+	HLCD_enuInit();
+	MTimer1_enuInit();
+	TCCR1B |=(1<<6); // trigger at rising edge
+	sei();
+	TIMSK |=(1<<5); // Timer/Counter1, Input Capture Interrupt Enable
+	while (1)
+	{
+	}
+}
+
+
+

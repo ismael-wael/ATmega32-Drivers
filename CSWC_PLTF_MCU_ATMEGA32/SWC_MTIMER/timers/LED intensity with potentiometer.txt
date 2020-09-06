@@ -1,0 +1,70 @@
+#define F_CPU 8000000UL
+#include "avr/io.h"
+#include "LIB_stdTypes.h"
+#include "LIB_BMNP.h"
+#include "util/delay.h"
+#include "ATMega32_Features.h"
+
+void TCCR0_enuInit()
+{
+	BMNP_u8ClearBit(TCCR0,7);
+
+	BMNP_u8SetBit(TCCR0,6);
+	BMNP_u8SetBit(TCCR0,3);
+
+	BMNP_u8SetBit(TCCR0,5);
+	BMNP_u8ClearBit(TCCR0,4);
+
+	BMNP_u8SetBit(TCCR0,1);
+	BMNP_u8ClearBit(TCCR0,0);
+	BMNP_u8ClearBit(TCCR0,2);
+}
+
+void MADC_enuInit()
+{
+    //Analog Channel0
+	BMNP_u8ClearBit(ADMUX, 0);
+	BMNP_u8ClearBit(ADMUX, 1);
+	BMNP_u8ClearBit(ADMUX, 2);
+	BMNP_u8ClearBit(ADMUX, 3);
+	BMNP_u8ClearBit(ADMUX, 4);
+    //Write one to ADLAR to left adjust the result.
+	BMNP_u8SetBit(ADMUX, 5);
+    //0 1 - AVCC with external capacitor at AREF pin
+	BMNP_u8SetBit(ADMUX, 6);//1
+	BMNP_u8ClearBit(ADMUX, 7);//0
+    //Writing this bit to one enables the ADC
+	BMNP_u8SetBit(ADCSRA, 7);
+	//ADC Auto Trigger Disable
+	BMNP_u8ClearBit(ADCSRA, 5);
+    //disable interrupt
+	BMNP_u8ClearBit(ADCSRA, 3);
+	//ADC Prescaler Select Bits
+	BMNP_u8ClearBit(ADCSRA, 2);
+	BMNP_u8ClearBit(ADCSRA, 1);
+	BMNP_u8SetBit(ADCSRA, 0);
+
+	BMNP_u8SetBit(ADCSRA, 4); //check interrupt
+}
+
+u16 MADC_u16startConversion()
+{
+    //write this bit to one to start the first conversion
+	BMNP_u8SetBit(ADCSRA, 6);
+    //polling on Interrupt Flag
+	while (!BMNP_u8GetBit(ADCSRA, 4));
+	BMNP_u8SetBit(ADCSRA, 4); //flag
+	return ADCH;
+}
+
+void main(void)
+{
+	MADC_enuInit();
+	TCCR0_enuInit();
+	BMNP_u8SetBit(DDRB_Register,3);
+
+	while(1)
+	{
+		OCR0 = MADC_u16startConversion();
+	}
+}

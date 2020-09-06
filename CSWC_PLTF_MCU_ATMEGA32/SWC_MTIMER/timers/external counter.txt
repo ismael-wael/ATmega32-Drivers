@@ -1,0 +1,22 @@
+/*
+ * main.c
+ *
+ *  Created on: ??þ/??þ/????
+ *      Author: Elsa7er
+ */
+#include "include.h"
+
+int main(void)
+{
+	HLCD_enuInit();
+	HLCD_voidDisplayString("Result = ");
+
+
+
+	DDRA_Register = 0xff;
+	while (1)
+	{ 
+		PORTA_Register = TCNT0;
+		HLCD_voidIntegerToString(TCNT0);
+	}
+}

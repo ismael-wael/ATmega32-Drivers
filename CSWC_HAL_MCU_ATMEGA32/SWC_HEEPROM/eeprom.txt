@@ -1,0 +1,98 @@
+tenumI2CErrorState EEPROM_WriteByte(u8 data)
+{
+	u8 x[8]="Embedded";
+   tenumI2CErrorState state = 0;
+
+  // Start TWI
+  MI2C_voidStartSynCond();
+
+  // Get State
+  state = MI2C_enuReadStatus();
+
+  //send Addess + '0' for write
+  MI2C_voidWriteByte(0b10100000);
+
+  //send Location
+  MI2C_voidWriteByte(0x00);
+
+  // Get State
+  state = MI2C_enuReadStatus();
+
+  // Send Data
+  MI2C_voidWriteByte(x[data]);
+  /*MI2C_voidWriteByte('s');
+  MI2C_voidWriteByte('m');
+  MI2C_voidWriteByte('a');
+  MI2C_voidWriteByte('e');
+  MI2C_voidWriteByte('l');
+*/
+  // Get State
+  state = MI2C_enuReadStatus();
+
+  // TWI Stop
+  MI2C_voidStopCond();
+  // Return Done
+  return state;
+}
+
+tenumI2CErrorState EEPROM_ReadByte(unsigned char *data)
+{
+	tenumI2CErrorState state = 0;
+
+	// Start TWI
+	MI2C_voidStartSynCond();
+
+	// Get State
+	state = MI2C_enuReadStatus();
+
+	//send Addess + '0' for write
+	MI2C_voidWriteByte(0b10100000);
+
+	//send Location
+	MI2C_voidWriteByte(0x00);
+
+	// Get State
+	state = MI2C_enuReadStatus();
+
+	// repeat Start TWI
+	MI2C_voidStartSynCond();
+
+	// Get State
+	state = MI2C_enuReadStatus();
+
+	//send Addess + '1' for read
+	MI2C_voidWriteByte(0b10100001);
+
+  // Read Data
+	MI2C_enuReadByte(data);
+	/*MI2C_enuReadByte(&data[1]);
+	MI2C_enuReadByte(&data[2]);*/
+  // TWI Stop
+  MI2C_voidStopCond();
+  // Return Done
+  return state;
+}
+
+int main(void)
+{
+	//pull up of SDA, SCL
+	SET_BIT(PORTC_Register,0);
+	SET_BIT(PORTC_Register,1);
+
+	MI2C_voidInit();
+	HLCD_enuInit();
+	u8 y[8];
+
+    for(u8 i =0;i<=7;i++)
+    {
+    	EEPROM_WriteByte(i);
+    	_delay_ms(2);
+    	EEPROM_ReadByte(&y[i]);
+    	_delay_ms(2);
+    	HLCD_enuWriteData(y[i]);
+    }
+	while(1)
+	{
+
+	}
+}

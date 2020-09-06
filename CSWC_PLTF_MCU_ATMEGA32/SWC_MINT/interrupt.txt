@@ -1,0 +1,30 @@
+
+
+ISR(INT0_vect)
+{
+    BMNP_u8ToggleBit( PORTA_Register, 7);
+}
+
+ISR(INT1_vect)
+{
+    BMNP_u8ToggleBit( PORTA_Register, 6);
+}
+
+
+int main(void)
+{
+	DDRA_Register = 0b11000000;
+    DDRD_Register =0x00;
+    PORTD_Register = 0b00001100;
+    BMNP_u8SetBit(GICR,6);
+    BMNP_u8SetBit(GICR,7);
+
+    BMNP_u8SetBit(SREG,7);
+
+    BMNP_u8SetBit(MCUCR,1);
+    BMNP_u8ClearBit(MCUCR,0);
+
+	while(1)
+	{
+	}
+}

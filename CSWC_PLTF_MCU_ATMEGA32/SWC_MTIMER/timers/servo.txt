@@ -1,0 +1,68 @@
+//main avr libraries
+#include "util/delay.h"
+#include "avr/io.h"
+#define F_CPU 8000000UL
+//used libraries
+#include "../CSWC_PLTF_BSW_ATMEGA32/LIB_STDTypes/LIB_stdTypes.h"
+#include "../CSWC_PLTF_BSW_ATMEGA32/LIB_BMNP/LIB_BMNP.h"
+#include "../CSWC_PLTF_BSW_ATMEGA32/Platform/ATMega32_Features.h"
+//LCD
+#include "../CSWC_PLTF_BSW_ATMEGA32/SWC_HLCD/Priv.h"
+#include "../CSWC_PLTF_BSW_ATMEGA32/SWC_HLCD/CSWC_HLCD_init.h"
+
+//keypad
+#include "../CSWC_PLTF_BSW_ATMEGA32/SWC_HKeyPad/CSWC_HKeyPad_init.h"
+//MDIO
+#include "../CSWC_PLTF_BSW_ATMEGA32/CSWC_PLTF_MCU_ATMEGA32/SWC_MDIO/CSWC_MDIO_int.h"
+#define F_CPU 8000000UL
+#include "avr/io.h"
+
+
+/*void TCCR1A_enuInit()
+{
+	BMNP_u8ClearBit(TCCR1A,0);
+	BMNP_u8SetBit(TCCR1A,1);
+
+	BMNP_u8SetBit(TCCR1A,7);
+	BMNP_u8SetBit(TCCR1A,5);
+	BMNP_u8ClearBit(TCCR1A,6);
+	BMNP_u8ClearBit(TCCR1A,4);
+
+	BMNP_u8ClearBit(TCCR1A,2);
+	BMNP_u8ClearBit(TCCR1A,3);
+}*/
+
+/*void TCCR1B_enuInit()
+{
+	BMNP_u8SetBit(TCCR1B,4);
+	BMNP_u8SetBit(TCCR1B,3);
+
+	BMNP_u8ClearBit(TCCR1B,7);
+	BMNP_u8SClearBit(TCCR1B,6);
+
+	BMNP_u8SetBit(TCCR1B,1);
+	BMNP_u8SetBit(TCCR1B,0);
+	BMNP_u8ClearBit(TCCR1B,2);
+}*/
+
+void main(void)
+{
+	TCCR1A=0B10000010;
+	TCCR1B=0B00011011;
+	ICR1=2500;
+	BMNP_u8SetBit(DDRD_Register,5);
+	OCR1A=313;
+	//TCCR1A_enuInit();
+	//TCCR1B_enuInit();
+	//BMNP_u8SetBit(DDRD_Register,5);
+	//ICR1=2500;
+	//OCR1A=0.05*ICR1;
+	while(1)
+	{
+	}
+
+}
+
+
+
+

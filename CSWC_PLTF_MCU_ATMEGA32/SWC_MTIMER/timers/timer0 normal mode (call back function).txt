@@ -1,0 +1,24 @@
+#include "Include.h"
+
+ u8 x = 0;
+
+ void Timer0 (void)
+ {
+	 x++;
+	 if(x == 60)
+	 {
+		 PORTA_Register ^=(1<<0);
+		 x = 0;
+	 }
+ }
+
+int main(void)
+{
+	MTimer0_enuInit();
+	DDRA_Register |=(1<<0);
+	TIMER0_OVF(Timer0);
+
+	while (1)
+	{
+	}
+}

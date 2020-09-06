@@ -1,0 +1,74 @@
+/*
+ * testing.c
+ *
+ * Created: 31/03/2020 02:29:42 ã
+ * Author : Elsa7er
+ */
+#include "Include.h"
+
+/*that's how to make function pointer as typedef*/
+typedef void (*fptr)(void);
+
+typedef struct{
+	u8 periodicity;
+	u8 first_delay;
+	fptr Fptr;
+}task;
+
+void func1 (void)
+{
+	PORTA_Register ^=(1<<0);
+}
+
+void func2 (void)
+{
+	PORTA_Register ^=(1<<1);
+}
+
+void func3 (void)
+{
+	PORTA_Register ^=(1<<2);
+}
+
+task task_arr[3] = {{1,0,func1},
+					{2,0,func2},
+					{3,0,func3}};
+
+
+void scheduler(void)
+{
+	for(u8 i = 0 ; i < 3 ; i++)
+	{
+		if(task_arr[i].first_delay == 0)
+		{
+			task_arr[i].Fptr();
+			task_arr[i].first_delay = task_arr[i].periodicity - 1 ;
+		}
+		else
+		{
+			task_arr[i].first_delay-- ;
+		}
+	}
+}
+
+void timer0 (void)
+{
+	static u8 counter = 0;
+	counter++;
+	if(counter == 31)
+	{
+		counter = 0;
+		scheduler();
+	}
+}
+
+int main(void)
+{
+	MTimer0_enuInit();
+	TIMER0_OVF(timer0);
+	DDRA_Register = 0x07;
+
+	while (1)
+	{
+	}
+}

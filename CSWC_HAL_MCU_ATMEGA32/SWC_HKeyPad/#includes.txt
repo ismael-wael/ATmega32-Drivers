@@ -1,0 +1,12 @@
+//main avr libraries
+#include "util/delay.h"
+#include "avr/io.h"
+#define F_CPU 8000000UL
+//used libraries
+#include "../LIB_STDTypes/LIB_stdTypes.h"
+#include "../LIB_BMNP/LIB_BMNP.h"
+#include "../Platform/ATMega32_Features.h"
+
+//MDIO
+#include "../CSWC_PLTF_MCU_ATMEGA32/SWC_MDIO/CSWC_MDIO_int.h"
+#include "../CSWC_PLTF_MCU_ATMEGA32/SWC_MDIO/CSWC_MDIO_cfg.h"

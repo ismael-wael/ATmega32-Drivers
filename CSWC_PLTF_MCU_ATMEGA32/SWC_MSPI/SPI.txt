@@ -1,0 +1,53 @@
+
+void SPI_init(void)
+{
+	SPCR = 0b01110011;
+	SPSR = 0;
+}
+
+void SPI_DataTransmit()
+{
+	/*u8 u8Counter;
+	for(u8Counter=0;*(pu8String+u8Counter)!='\0';u8Counter++)
+	{
+		SPDR = *(pu8String+u8Counter);
+		while(GET_BIT(SPSR,SPIF));
+			SPSR = 0;
+	}*/
+	SPDR = 'A';
+	while(!GET_BIT(SPSR,SPIF));
+
+	SPDR = 'l';
+	while(!GET_BIT(SPSR,SPIF));
+
+	SPDR = 'i';
+	while(!GET_BIT(SPSR,SPIF));
+
+}
+
+u8 SPI_DataRecieve(void)
+{
+	while(GET_BIT(SPSR,SPIF))
+	{
+		SPSR = 0;
+	}
+	return SPDR;
+}
+
+void main(void)
+{
+	HLCD_enuInit();
+    SET_BIT(DDRB_Register,4);
+    SET_BIT(DDRB_Register,5);
+    SET_BIT(DDRB_Register,7);
+    CLR_BIT(DDRB_Register,6);
+
+	SPI_init();
+	SPI_DataTransmit("Embedded Systems");
+	HLCD_enuWriteData(SPI_DataRecieve());
+
+	while (1)
+	{
+	}
+	return;
+}

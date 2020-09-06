@@ -1,0 +1,35 @@
+/*
+ * main.c
+ *
+ *  Created on: ??þ/??þ/????
+ *      Author: Elsa7er
+ */
+#include "include.h"
+
+int main(void)
+{
+	MADC_enuInit();
+
+	u16 analogVal,Val=0;
+	pu16 pu16Val=&Val;
+	u16 u16_ADCValue =0;
+	TCCR1A = 0b10000010;
+	TCCR1B = 0b00011011;
+	ICR1H  = 0x09;
+	ICR1L  = 0xC4;
+	//OCR1AH = 0x00;
+	//OCR1AL = x;
+	TIMSK |=(1<<4);
+	sei();
+	DDRD_Register |=(1<<5);
+	DDRD_Register |=(1<<4);
+	while(1)
+	{
+	    MADC_enuStartConversion(pu16Val);
+	    //analogVal = ((Val * 5) / 256);
+	    u16_ADCValue = Val;
+	    u16_ADCValue /= 3;
+	    OCR1A = u16_ADCValue;   //0 degree
+	    _delay_ms (20);
+	}
+}

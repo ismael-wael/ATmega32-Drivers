@@ -1,0 +1,15 @@
+this project is about blinking one led every 1 sec
+
+it uses timer 0
+system clock = 4 MHz
+prescaller = 8
+
+and the led is in PORTA pin 0
+
+note that:
+in case of polling, we diable interrupt of the timer and also no need for global interrupt
+
+and we poll on interrupt flag,
+the flag that is set to one when timer overflows
+it's the same flag in case of interrupt and polling
+

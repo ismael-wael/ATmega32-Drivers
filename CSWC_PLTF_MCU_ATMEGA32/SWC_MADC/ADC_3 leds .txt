@@ -1,0 +1,80 @@
+//main avr libraries
+#include "util/delay.h"
+#include "avr/io.h"
+#define F_CPU 8000000UL
+//used libraries
+#include "../CSWC_PLTF_BSW_ATMEGA32/LIB_STDTypes/LIB_stdTypes.h"
+#include "../CSWC_PLTF_BSW_ATMEGA32/LIB_BMNP/LIB_BMNP.h"
+#include "../CSWC_PLTF_BSW_ATMEGA32/Platform/ATMega32_Features.h"
+//LCD
+#include "../CSWC_PLTF_BSW_ATMEGA32/SWC_HLCD/Priv.h"
+#include "../CSWC_PLTF_BSW_ATMEGA32/SWC_HLCD/CSWC_HLCD_init.h"
+
+//keypad
+#include "../CSWC_PLTF_BSW_ATMEGA32/SWC_HKeyPad/CSWC_HKeyPad_init.h"
+//MDIO
+#include "../CSWC_PLTF_BSW_ATMEGA32/CSWC_PLTF_MCU_ATMEGA32/SWC_MDIO/CSWC_MDIO_int.h"
+
+void MADC_enuInit() {
+    //Analog Channel0
+	BMNP_u8ClearBit(ADMUX, 0);
+	BMNP_u8ClearBit(ADMUX, 1);
+	BMNP_u8ClearBit(ADMUX, 2);
+	BMNP_u8ClearBit(ADMUX, 3);
+	BMNP_u8ClearBit(ADMUX, 4);
+    //Write one to ADLAR to left adjust the result.
+	BMNP_u8SetBit(ADMUX, 5);
+    //0 1 - AVCC with external capacitor at AREF pin
+	BMNP_u8SetBit(ADMUX, 6);//1
+	BMNP_u8ClearBit(ADMUX, 7);//0
+    //Writing this bit to one enables the ADC
+	BMNP_u8SetBit(ADCSRA, 7);
+	//ADC Auto Trigger Disable
+	BMNP_u8ClearBit(ADCSRA, 5);
+    //disable interrupt
+	BMNP_u8ClearBit(ADCSRA, 3);
+	//ADC Prescaler Select Bits
+	BMNP_u8ClearBit(ADCSRA, 2);
+	BMNP_u8ClearBit(ADCSRA, 1);
+	BMNP_u8SetBit(ADCSRA, 0);
+
+	BMNP_u8SetBit(ADCSRA, 4); //check interrupt
+}
+
+u16 MADC_u16startConversion() {
+    //write this bit to one to start the first conversion
+	BMNP_u8SetBit(ADCSRA, 6);
+    //polling on Interrupt Flag
+	while (!BMNP_u8GetBit(ADCSRA, 4));
+	BMNP_u8SetBit(ADCSRA, 4); //flag
+	return ADCH;
+}
+
+
+void main(void) {
+
+	u16 analogVal, val;
+	MADC_enuInit();
+        DDRD_Register = 7;
+
+	while (1) {
+		val = MADC_u16startConversion();
+		analogVal = ((val * 5) / 256);
+		if ((analogVal >= 0) && (analogVal < 2)) {
+			BMNP_u8SetBit(PORTD_Register, 0);
+			BMNP_u8ClearBit(PORTD_Register, 1);
+			BMNP_u8ClearBit(PORTD_Register, 2);
+		} else if ((analogVal >= 2) && (analogVal < 4)) {
+			BMNP_u8SetBit(PORTD_Register, 1);
+			BMNP_u8ClearBit(PORTD_Register, 0);
+			BMNP_u8ClearBit(PORTD_Register, 2);
+		} else {
+			BMNP_u8SetBit(PORTD_Register, 2);
+			BMNP_u8ClearBit(PORTD_Register, 1);
+			BMNP_u8ClearBit(PORTD_Register, 0);
+		}
+	}
+}
+
+
+
